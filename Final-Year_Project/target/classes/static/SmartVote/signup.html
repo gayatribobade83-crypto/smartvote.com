@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SmartVote Signup</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="signup-page">
+
+<div class="signup-container">
+<div class="signup-card">
+
+<h2>Create Account</h2>
+
+<form id="signupForm">
+
+<input type="text" id="name" placeholder="Full Name" required>
+
+<input type="email" id="email" placeholder="Email Address" required>
+
+<input type="password" id="password" placeholder="Password" required>
+
+<select id="role" required>
+<option value="">Select Role</option>
+<option value="voter">Voter</option>
+<option value="admin">Admin</option>
+</select>
+
+<button type="submit">Signup</button>
+
+</form>
+
+<p>Already have an account? <a href="login.html">Login</a></p>
+
+</div>
+</div>
+
+<script>
+console.log("JS is running");
+
+const signupForm = document.getElementById("signupForm");
+
+if(signupForm){
+signupForm.addEventListener("submit", function(e){
+e.preventDefault();
+
+console.log("Signup clicked"); // DEBUG
+
+let user = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    password: document.getElementById("password").value,
+    role: document.getElementById("role").value
+};
+
+console.log(user); // DEBUG
+
+fetch("http://localhost:8082/signup", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(user)   // ✅ FIXED
+})
+.then(res => res.json())
+.then(data => {
+    alert("Signup successful ✅");
+    window.location.href = "login.html";
+})
+.catch(err => {
+    console.error(err);
+    alert("Error ❌");
+});
+
+});
+}
+</script>
+
+</body>
+</html>

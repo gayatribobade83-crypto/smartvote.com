@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Results</title>
+<link rel="stylesheet" href="home.css">
+</head>
+
+<body>
+
+<h2>Election Results</h2>
+
+<div id="results"></div>
+<h2 id="winner"></h2>
+
+<script>
+
+let elections = JSON.parse(localStorage.getItem("elections")) || [];
+let selected = JSON.parse(localStorage.getItem("selectedElection"));
+
+if(!selected){
+    alert("No election selected!");
+    window.location.href="home.html";
+}
+
+// ✅ Get latest updated data
+let election = elections.find(e => e.accessCode === selected.accessCode);
+
+let totalVotes = election.candidates.reduce((sum,c)=>sum+c.votes,0);
+
+let maxVotes = 0;
+let winner = "";
+
+election.candidates.forEach(c=>{
+
+    let percent = totalVotes ? ((c.votes/totalVotes)*100).toFixed(1) : 0;
+
+    let div = document.createElement("div");
+
+    div.innerHTML = `
+        <h3>${c.name}</h3>
+        <div class="bar" style="width:${percent}%"></div>
+        <p>${c.votes} votes (${percent}%)</p>
+    `;
+
+    document.getElementById("results").appendChild(div);
+
+    if(c.votes > maxVotes){
+        maxVotes = c.votes;
+        winner = c.name;
+    }
+});
+
+// Winner
+document.getElementById("winner").innerText = "🏆 Winner: " + winner;
+
+</script>
+
+</body>
+</html>

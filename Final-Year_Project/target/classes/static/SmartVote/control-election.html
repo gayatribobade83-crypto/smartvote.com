@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Control Election</title>
+<link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Control Election</h2>
+
+<p id="title"></p>
+<p id="status"></p>
+
+<h3>Candidates</h3>
+<div id="candidateList"></div>
+
+<button onclick="stopVoting()">Stop Voting</button>
+<br><br><button onclick="startVoting()">Start Voting</button>
+<br><br><button onclick="deleteElection()">Delete Election</button>
+<br><br><button onclick="viewResults()">View Results</button>
+
+</div>
+
+<script>
+// ✅ Get all elections
+let elections = JSON.parse(localStorage.getItem("elections")) || [];
+
+if(elections.length === 0){
+    alert("No Election Found!");
+    window.location.href = "launch-election.html";
+} 
+
+// ✅ Use the latest election for control
+let election = elections[elections.length - 1];
+
+// Display election info
+document.getElementById("title").innerText = "Election: " + election.title;
+document.getElementById("status").innerText = "Status: " + election.status;
+
+// Display candidates with Edit/Delete buttons
+let list = document.getElementById("candidateList");
+list.innerHTML = ""; // clear before appending
+
+election.candidates.forEach((c, index) => {
+    list.innerHTML += `
+    <div class="card">
+        <p>
+            <b>Name:</b> ${c.name}<br>
+            <b>Panel:</b> ${c.party}<br>
+            <b>Start:</b> ${c.start}<br>
+            <b>End:</b> ${c.end}
+        </p>
+        <button onclick="editCandidate(${index})">Edit</button>
+        <button onclick="deleteCandidate(${index})">Delete</button>
+    </div>
+    <hr>
+    `;
+});
+
+// Functions
+function stopVoting(){
+    election.status = "Stopped";
+    saveElection();
+    localStorage.setItem("selectedElection", JSON.stringify(election));
+}
+
+function startVoting(){
+    election.status = "Running";
+    saveElection();
+    localStorage.setItem("selectedElection", JSON.stringify(election));
+}
+
+function deleteElection(){
+    elections.pop();
+    localStorage.setItem("elections", JSON.stringify(elections));
+    localStorage.removeItem("selectedElection");
+    alert("Election Deleted Successfully");
+    window.location.href = "launch-election.html";
+}
+
+function deleteCandidate(index){
+    election.candidates.splice(index,1);
+    saveElection();
+    localStorage.setItem("selectedElection", JSON.stringify(election));
+    alert("Candidate Deleted");
+    location.reload();
+}
+
+function editCandidate(index){
+    let newName = prompt("Enter new name:", election.candidates[index].name);
+    let newPanel = prompt("Enter new panel:", election.candidates[index].party);
+    if(newName && newPanel){
+        election.candidates[index].name = newName;
+        election.candidates[index].party = newPanel;
+        saveElection();
+        localStorage.setItem("selectedElection", JSON.stringify(election));
+        alert("Updated Successfully");
+        location.reload();
+    }
+}
+
+// ✅ Save election back to the elections array in localStorage
+function saveElection(){
+    elections[elections.length - 1] = election;
+    localStorage.setItem("elections", JSON.stringify(elections));
+    location.reload();
+}
+
+// ✅ View results
+function viewResults(){
+    localStorage.setItem("selectedElection", JSON.stringify(election));
+    window.location.href = "admin-result-dashboard.html";
+}
+</script>
+
+</body>
+</html>

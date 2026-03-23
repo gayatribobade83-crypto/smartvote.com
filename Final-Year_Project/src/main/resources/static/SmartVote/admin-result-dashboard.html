@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Results Dashboard</title>
+<link rel="stylesheet" href="home.css">
+<style>
+table{width:80%;margin:40px auto;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;}
+th{background:#092871;color:white;padding:12px;}
+td{padding:10px;border-bottom:1px solid #ddd;text-align:center;}
+h2,h3{text-align:center;}
+</style>
+</head>
+<body>
+
+<h2>Election Results</h2>
+<table>
+<tr><th>Name</th><th>Panel</th><th>Votes</th></tr>
+<tbody id="results"></tbody>
+</table>
+<h3 id="winner"></h3>
+
+<script>
+let election = JSON.parse(localStorage.getItem("selectedElection"));
+if(!election){ 
+    alert("No election selected!"); 
+    window.location.href="home.html"; 
+}
+
+let table = document.getElementById("results");
+let maxVotes = 0, winner="";
+
+election.candidates.forEach(c=>{
+    table.innerHTML += `<tr><td>${c.name}</td><td>${c.party}</td><td>${c.votes}</td></tr>`;
+    if(c.votes>maxVotes){ maxVotes = c.votes; winner=c.name; }
+});
+
+document.getElementById("winner").innerText = "Winner: "+winner;
+</script>
+
+</body>
+</html>

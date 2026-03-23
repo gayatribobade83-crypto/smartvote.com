@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+<link rel="stylesheet" href="admin.css">
+<style>
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    background: white;
+    width: 220px;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.title {
+    text-align: center;
+    margin: 30px 0;
+    font-size: 32px;
+    color: #333;
+}
+
+.search-box {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    padding: 10px;
+    width: 300px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<h1 class="title">Admin Dashboard</h1>
+
+<div class="search-box">
+    <input type="text" placeholder="Search admin actions..." id="searchInput">
+</div>
+
+<div class="card-container" id="cardContainer">
+
+    <div class="card">
+        <h2>Launch Election</h2>
+        <p>Create a new election</p>
+        <button onclick="window.location.href='launch-election.html'">Add</button>
+    </div>
+
+    <div class="card">
+        <h2>Control Election</h2>
+        <p>Update existing election</p>
+        <button onclick="window.location.href='control-election.html'">Edit</button>
+    </div>
+
+    <div class="card">
+        <h2>Results Dashboard</h2>
+        <p>Check voting results</p>
+        <button onclick="window.location.href='admin-result-dashboard.html'">View</button>
+    </div>
+
+</div>
+
+<script>
+// ✅ Search functionality for admin cards
+const searchInput = document.getElementById("searchInput");
+const cards = document.querySelectorAll(".card");
+
+searchInput.addEventListener("keyup", function(){
+    const value = searchInput.value.toLowerCase();
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if(text.includes(value)){
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+});
+</script>
+
+</body>
+</html>

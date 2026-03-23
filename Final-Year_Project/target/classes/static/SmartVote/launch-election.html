@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Launch Election</title>
+<link rel="stylesheet" href="dashboard.css">
+<style>
+/* Style Add Candidate button */
+button.add-candidate{
+    margin:10px 0;
+    background:#34a853;
+    color:white;
+    padding:8px 15px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+}
+button.add-candidate:hover{
+    background:#2e7d32;
+}
+
+/* Style Delete Candidate button */
+button.delete-candidate{
+    background:#e53935;
+    color:white;
+    padding:4px 10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:12px;
+    float:right;
+    margin-top:5px;
+}
+button.delete-candidate:hover{
+    background:#b71c1c;
+}
+
+/* Candidate div spacing */
+.candidate{
+    position: relative;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:10px;
+    margin-bottom:15px;
+    background:#f9f9f9;
+}
+.candidate h3{
+    margin-top:0;
+    margin-bottom:10px;
+}
+.candidate label{
+    display:block;
+    margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Create New Election</h2>
+
+<label>Election Title</label>
+<input id="title" type="text"><br><br>
+
+<label>Election Access Code</label>
+<input id="accessCode" type="text" placeholder="Enter a unique code"><br><br>
+
+<div id="candidatesContainer">
+  <!-- Candidate 1 -->
+  <div class="candidate">
+    <h3>Candidate 1</h3>
+    <label>Name</label>
+    <input class="cname" type="text">
+    <label>Panel</label>
+    <input class="cparty" type="text">
+    <label>Start Date & Time</label>
+    <input class="cstart" type="datetime-local">
+    <label>End Date & Time</label>
+    <input class="cend" type="datetime-local">
+    <br><br><button class="delete-candidate" onclick="deleteCandidate(this)">🗑 Delete</button>
+  </div>
+
+  <!-- Candidate 2 -->
+  <br><br><div class="candidate">
+    <h3>Candidate 2</h3>
+    <label>Name</label>
+    <input class="cname" type="text">
+    <label>Panel</label>
+    <input class="cparty" type="text">
+    <label>Start Date & Time</label>
+    <input class="cstart" type="datetime-local">
+    <label>End Date & Time</label>
+    <input class="cend" type="datetime-local">
+    <button class="delete-candidate" onclick="deleteCandidate(this)">🗑 Delete</button>
+  </div>
+</div>
+
+<br><br><button class="add-candidate" onclick="addCandidate()">➕ Add Candidate</button><br><br>
+<button onclick="startElection()">Start Election</button>
+
+</div>
+
+<script>
+let candidateCount = 2;
+
+// Update numbering after deletion
+function updateCandidateNumbers(){
+    const candidates = document.querySelectorAll(".candidate");
+    candidates.forEach((c, i) => {
+        c.querySelector("h3").innerText = `Candidate ${i+1}`;
+    });
+    candidateCount = candidates.length;
+}
+
+function addCandidate(){
+    candidateCount++;
+    const container = document.getElementById("candidatesContainer");
+    const div = document.createElement("div");
+    div.className = "candidate";
+    div.innerHTML = `
+      <h3>Candidate ${candidateCount}</h3>
+      <label>Name</label>
+      <input class="cname" type="text">
+      <label>Panel</label>
+      <input class="cparty" type="text">
+      <label>Start Date & Time</label>
+      <input class="cstart" type="datetime-local">
+      <label>End Date & Time</label>
+      <input class="cend" type="datetime-local">
+      <button class="delete-candidate" onclick="deleteCandidate(this)">🗑 Delete</button>
+    `;
+    container.appendChild(div);
+}
+
+function deleteCandidate(btn){
+    btn.parentElement.remove();
+    updateCandidateNumbers();
+}
+
+function startElection(){
+    let title = document.getElementById("title").value;
+    let code = document.getElementById("accessCode").value;
+
+    if(!title || !code){
+        alert("Please enter title and access code!");
+        return;
+    }
+
+    const names = document.querySelectorAll(".cname");
+    const parties = document.querySelectorAll(".cparty");
+    const starts = document.querySelectorAll(".cstart");
+    const ends = document.querySelectorAll(".cend");
+
+    let candidates = [];
+    for(let i=0; i<names.length; i++){
+        if(names[i].value){
+            candidates.push({
+                name: names[i].value,
+                party: parties[i].value || "Independent",
+                start: starts[i].value,
+                end: ends[i].value,
+                votes: 0
+            });
+        }
+    }
+
+    if(candidates.length < 1){
+        alert("Please enter at least one candidate!");
+        return;
+    }
+
+    let election = {
+        title: title,
+        accessCode: code,
+        status: "Running",
+        candidates: candidates
+    };
+
+    let elections = JSON.parse(localStorage.getItem("elections")) || [];
+    elections.push(election);
+    localStorage.setItem("elections", JSON.stringify(elections));
+
+    // ✅ Set selectedElection for results dashboard
+    localStorage.setItem("selectedElection", JSON.stringify(election));
+
+    alert("✅ Election Started Successfully!");
+    window.location.href = "control-election.html";
+}
+</script>
+
+</body>
+</html>

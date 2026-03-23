@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login</title>
+</head>
+<body>
+
+<h2>Voter Login</h2>
+<input type="email" id="email" placeholder="Enter Email"><br><br>
+<input type="password" id="password" placeholder="Enter Password"><br><br>
+
+<button onclick="login()">Login</button>
+
+<script>
+function login(){
+    let email = document.getElementById("email").value;
+
+    if(!email){
+        alert("Enter email!");
+        return;
+    }
+
+    localStorage.setItem("voterLoggedIn", JSON.stringify({email}));
+    alert("✅ Login successful!");
+    window.location.href = "home.html";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,5 @@
+com\agmv\smartvote\HomeController.class
+com\agmv\smartvote\UserController.class
+com\agmv\smartvote\UserRepository.class
+com\agmv\smartvote\User.class
+com\agmv\smartvote\SmartvoteApplication.class

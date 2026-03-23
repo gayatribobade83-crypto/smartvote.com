@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Vote Page</title>
+<link rel="stylesheet" href="home.css">
+</head>
+
+<body>
+
+<h2 id="electionTitle"></h2>
+<div id="candidatesContainer"></div>
+
+<button onclick="viewResults()">View Results</button>
+
+<script>
+// ✅ Check login
+let voter = JSON.parse(localStorage.getItem("voterLoggedIn"));
+if(!voter){
+    alert("Please login first!");
+    window.location.href="voter-login.html";
+}
+
+// ✅ Get selected election
+let selected = JSON.parse(localStorage.getItem("selectedElection"));
+let elections = JSON.parse(localStorage.getItem("elections")) || [];
+
+if(!selected){
+    alert("No election selected!");
+    window.location.href="home.html";
+}
+
+// ✅ Get latest election
+let election = elections.find(e => e.accessCode === selected.accessCode);
+
+document.getElementById("electionTitle").innerText = election.title;
+
+// ✅ One vote per user
+let votedKey = "voted_" + election.accessCode + "_" + voter.email;
+
+const container = document.getElementById("candidatesContainer");
+
+// total votes
+let totalVotes = election.candidates.reduce((sum,c)=>sum+c.votes,0);
+
+election.candidates.forEach((c,index)=>{
+
+    let percent = totalVotes ? ((c.votes/totalVotes)*100).toFixed(1) : 0;
+
+    let div = document.createElement("div");
+    div.className = "candidate";
+
+    div.innerHTML = `
+        <h3>${c.name}</h3>
+        <p>${c.party}</p>
+
+        <button ${localStorage.getItem(votedKey) ? "disabled" : ""}>
+            ${localStorage.getItem(votedKey) ? "Voted" : "Vote"}
+        </button>
+
+        <div class="bar" style="width:${percent}%"></div>
+        <p>${percent}%</p>
+    `;
+
+    div.querySelector("button").onclick = ()=>{
+
+        let voter = JSON.parse(localStorage.getItem("voterLoggedIn"));
+
+        if(!voter){
+            alert("Please login first");
+            return;
+        }
+
+        // 🔹 Call backend
+        fetch(`http://localhost:8082/vote?email=${voter.email}`, {
+            method: "POST"
+        })
+        .then(res => res.text())
+        .then(data => {
+
+            alert(data);
+
+            // ❌ If already voted or error → stop
+            if(data.includes("already") || data.includes("not found")) return;
+
+            // ✅ Increase vote in frontend
+            election.candidates[index].votes++;
+
+            // ✅ Update elections in localStorage
+            let updated = elections.map(e => {
+                if(e.accessCode === election.accessCode){
+                    return election;
+                }
+                return e;
+            });
+
+            localStorage.setItem("elections", JSON.stringify(updated));
+
+            // ✅ Mark user voted
+            localStorage.setItem(votedKey, "true");
+
+            // 🔄 Reload page to update UI
+            location.reload();
+        });
+    };
+
+    container.appendChild(div);
+});
+
+// View results
+function viewResults(){
+    window.location.href="results-dashboard.html";
+}
+</script>
+
+</body>
+</html>
